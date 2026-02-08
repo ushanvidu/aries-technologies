@@ -7,14 +7,14 @@ import { cn } from '@/lib/utils';
 const services = [
     {
         title: 'Software Solutions',
-        description: 'Scalable, robust, and high-performance software tailored to your enterprise needs.',
+        description: 'From concept to code — software that delivers real results.',
         icon: Code,
         colSpan: 'md:col-span-2',
         gradient: 'from-blue-500/20 to-purple-500/20',
     },
     {
         title: 'AI & Machine Learning',
-        description: 'Leverage the power of neural networks to automate and optimize your business.',
+        description: 'From data to predictions — smarter business starts here.',
         icon: Bot,
         colSpan: 'md:col-span-1',
         gradient: 'from-red-500/20 to-orange-500/20',
