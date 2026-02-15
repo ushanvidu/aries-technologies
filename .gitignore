@@ -31,3 +31,17 @@ ts-debug.log*
 
 # Vercel
 .vercel
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
