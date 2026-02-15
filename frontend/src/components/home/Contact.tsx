@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { api } from '@/lib/api';
 
 export function Contact() {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -12,18 +13,12 @@ export function Contact() {
         setStatus('loading');
 
         try {
-            const res = await fetch('http://localhost:5000/api/contact', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
+            await api.submitContact(formData);
+            setStatus('success');
+            setFormData({ name: '', email: '', message: '' });
 
-            if (res.ok) {
-                setStatus('success');
-                setFormData({ name: '', email: '', message: '' });
-            } else {
-                setStatus('error');
-            }
+            // Reset success message after 5 seconds
+            setTimeout(() => setStatus('idle'), 5000);
         } catch {
             setStatus('error');
         }

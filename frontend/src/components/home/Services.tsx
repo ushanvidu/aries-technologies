@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Code, Bot, Globe, Cpu, ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 const services = [
     {
@@ -11,6 +12,7 @@ const services = [
         icon: Code,
         colSpan: 'md:col-span-2',
         gradient: 'from-blue-500/20 to-purple-500/20',
+        slug: 'software-solutions',
     },
     {
         title: 'AI & Machine Learning',
@@ -18,6 +20,7 @@ const services = [
         icon: Bot,
         colSpan: 'md:col-span-1',
         gradient: 'from-red-500/20 to-orange-500/20',
+        slug: 'ai-machine-learning',
     },
     {
         title: 'Advanced Web Development',
@@ -25,6 +28,7 @@ const services = [
         icon: Globe,
         colSpan: 'md:col-span-1',
         gradient: 'from-green-500/20 to-emerald-500/20',
+        slug: 'web-development',
     },
     {
         title: 'Custom Tech Solutions',
@@ -32,6 +36,7 @@ const services = [
         icon: Cpu,
         colSpan: 'md:col-span-2',
         gradient: 'from-pink-500/20 to-rose-500/20',
+        slug: 'custom-solutions',
     },
 ];
 
@@ -58,43 +63,45 @@ export function Services() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {services.map((service, index) => (
-                        <motion.div
+                        <Link
                             key={service.title}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                            className={cn(
-                                "group relative p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden hover:border-white/20 transition-all duration-300",
-                                service.colSpan
-                            )}
+                            href={`/services/${service.slug}`}
+                            className={cn("block", service.colSpan)}
                         >
-                            {/* Gradient Blob on Hover */}
-                            <div
-                                className={cn(
-                                    "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
-                                    service.gradient
-                                )}
-                            />
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                                className="group relative p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden hover:border-white/20 transition-all duration-300 h-full cursor-pointer"
+                            >
+                                {/* Gradient Blob on Hover */}
+                                <div
+                                    className={cn(
+                                        "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                                        service.gradient
+                                    )}
+                                />
 
-                            <div className="relative z-10 flex flex-col h-full justify-between gap-8">
-                                <div className="flex justify-between items-start">
-                                    <div className="p-3 bg-white/10 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform duration-300">
-                                        <service.icon size={28} />
+                                <div className="relative z-10 flex flex-col h-full justify-between gap-8">
+                                    <div className="flex justify-between items-start">
+                                        <div className="p-3 bg-white/10 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform duration-300">
+                                            <service.icon size={28} />
+                                        </div>
+                                        <ArrowUpRight className="text-white/30 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
                                     </div>
-                                    <ArrowUpRight className="text-white/30 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-                                </div>
 
-                                <div>
-                                    <h4 className="text-2xl font-bold text-white mb-3 group-hover:text-primary transition-colors">
-                                        {service.title}
-                                    </h4>
-                                    <p className="text-white/60 leading-relaxed">
-                                        {service.description}
-                                    </p>
+                                    <div>
+                                        <h4 className="text-2xl font-bold text-white mb-3 group-hover:text-primary transition-colors">
+                                            {service.title}
+                                        </h4>
+                                        <p className="text-white/60 leading-relaxed">
+                                            {service.description}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        </motion.div>
+                            </motion.div>
+                        </Link>
                     ))}
                 </div>
             </div>
