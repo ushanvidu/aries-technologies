@@ -1,23 +1,27 @@
 const nodemailer = require('nodemailer');
 
-// Create reusable transporter
-const createTransporter = () => {
-    return nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD,
-        },
+// Create transporter once (singleton) – reused for all emails
+let _transporter = null;
+const getTransporter = () => {
+  if (!_transporter) {
+    _transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
     });
+  }
+  return _transporter;
 };
 
 // Email template for contact form submission
 const createContactEmailTemplate = (contactData) => {
-    const { name, email, phone, message, createdAt } = contactData;
+  const { name, email, phone, message, createdAt } = contactData;
 
-    return {
-        subject: `New Contact from ${name} - Aries Technologies`,
-        html: `
+  return {
+    subject: `New Contact from ${name} - Aries Technologies`,
+    html: `
       <!DOCTYPE html>
       <html>
       <head>
@@ -114,9 +118,9 @@ const createContactEmailTemplate = (contactData) => {
             <div class="field">
               <span class="label">🕐 Submitted</span>
               <span class="value">${new Date(createdAt).toLocaleString('en-US', {
-            dateStyle: 'full',
-            timeStyle: 'short'
-        })}</span>
+      dateStyle: 'full',
+      timeStyle: 'short'
+    })}</span>
             </div>
           </div>
           <div class="footer">
@@ -127,7 +131,7 @@ const createContactEmailTemplate = (contactData) => {
       </body>
       </html>
     `,
-        text: `
+    text: `
 New Contact Form Submission - Aries Technologies
 
 Name: ${name}
@@ -138,32 +142,38 @@ Submitted: ${new Date(createdAt).toLocaleString()}
 
 Reply to: ${email}
     `,
-    };
+  };
 };
 
 // Send contact notification email
 const sendContactNotification = async (contactData) => {
-    try {
-        const transporter = createTransporter();
-        const emailContent = createContactEmailTemplate(contactData);
+  // Skip email sending if credentials not configured
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.warn('⚠️  Email credentials not configured — skipping notification.');
+    return { success: false, error: 'Email not configured' };
+  }
 
-        const mailOptions = {
-            from: `"Aries Technologies" <${process.env.EMAIL_USER}>`,
-            to: process.env.EMAIL_TO || process.env.EMAIL_USER,
-            subject: emailContent.subject,
-            html: emailContent.html,
-            text: emailContent.text,
-        };
+  try {
+    const transporter = getTransporter();
+    const emailContent = createContactEmailTemplate(contactData);
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully:', info.messageId);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error('Error sending email:', error);
-        return { success: false, error: error.message };
-    }
+    const mailOptions = {
+      from: `"Aries Technologies" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_TO || process.env.EMAIL_USER,
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('Error sending email:', error.message);
+    return { success: false, error: error.message };
+  }
 };
 
 module.exports = {
-    sendContactNotification,
+  sendContactNotification,
 };

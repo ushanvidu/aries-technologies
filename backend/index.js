@@ -16,11 +16,16 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // Middleware
-app.use(helmet()); // Security headers
+app.use(helmet({
+    crossOriginResourcePolicy: false, // Allow Postman & external API clients
+    crossOriginEmbedderPolicy: false,
+})); // Security headers
 app.use(morgan('dev')); // Request logging
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-    credentials: true
+    origin: '*', // Allow all origins for API access (restrict in production if needed)
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false
 }));
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
@@ -32,8 +37,10 @@ app.get('/', (req, res) => {
         message: 'Aries Technologies API',
         version: '1.0.0',
         endpoints: {
+            admin: '/api/admin/login',
             contact: '/api/contact',
             serviceInquiry: '/api/services/inquiry',
+            serviceInquiries: '/api/services/inquiries',
             health: '/api/health'
         }
     });
@@ -75,14 +82,22 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🌐 CORS enabled for: ${process.env.CORS_ORIGIN || 'http://localhost:3000'}`);
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`CORS enabled for: ${process.env.CORS_ORIGIN || 'all origins'}`);
+
+    // Warn about missing optional config
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+        console.warn('⚠️  EMAIL_USER / EMAIL_PASSWORD not set — email notifications disabled.');
+    }
+    if (!process.env.JWT_SECRET) {
+        console.error('❌ CRITICAL: JWT_SECRET is not set. Admin auth will fail.');
+    }
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
-    console.error('❌ Unhandled Promise Rejection:', err);
+    console.error(' Unhandled Promise Rejection:', err);
     // Close server & exit process
     process.exit(1);
 });

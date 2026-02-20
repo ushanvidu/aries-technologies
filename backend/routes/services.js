@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const ServiceInquiry = require('../models/ServiceInquiry');
+const authMiddleware = require('../middleware/auth');
 
 // Validation middleware
 const validateServiceInquiry = [
@@ -94,8 +95,8 @@ router.post('/inquiry', validateServiceInquiry, async (req, res) => {
     }
 });
 
-// GET /api/services/inquiries - Get all service inquiries (for admin dashboard - optional)
-router.get('/inquiries', async (req, res) => {
+// GET /api/services/inquiries - Get all service inquiries (admin only)
+router.get('/inquiries', authMiddleware, async (req, res) => {
     try {
         const { serviceType, status, limit = 50, page = 1 } = req.query;
 
@@ -133,8 +134,8 @@ router.get('/inquiries', async (req, res) => {
     }
 });
 
-// GET /api/services/inquiries/:id - Get single inquiry by ID (for admin dashboard - optional)
-router.get('/inquiries/:id', async (req, res) => {
+// GET /api/services/inquiries/:id - Get single inquiry by ID (admin only)
+router.get('/inquiries/:id', authMiddleware, async (req, res) => {
     try {
         const inquiry = await ServiceInquiry.findById(req.params.id).select('-__v');
 
